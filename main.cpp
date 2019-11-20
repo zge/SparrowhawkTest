@@ -16,22 +16,40 @@ string cwd() {
     return string(buf);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char* argv[]) {
 
     string af_dir = cwd();
-    af_dir = af_dir.substr(0, af_dir.size() - 3) + "af/"; //remove 'bin' from the end and add 'af'
+    string lang = "grammars"; // specify language
+    af_dir = af_dir.substr(0, af_dir.size() - 3) + lang + "/"; //remove 'bin' from the end and add language
+    //cout << "af_dir: " << af_dir << endl;
 
     speech::sparrowhawk::Normalizer normalizer;
 
     normalizer.Setup("sparrowhawk_configuration.ascii_proto", af_dir);
 
-    string in = "I have 123 apples.";
-    string out = "";
+    string in;
+    string out;
 
-    normalizer.Normalize(in, &out);
+    string input = argv[1];
+    string output = argv[2];
+    cout << "input file: " << input << ", output file: " << output << endl;
 
-    cout << "INPUT: " << in << endl;
-    cout << "OUTPUT: " << out << endl;
+    string line;
+    ifstream infile (input);
+    ofstream outfile;
+    outfile.open(output);
+    if (infile.is_open())
+    {
+      while ( getline (infile, line))
+      {
+	in = line;
+	out = "";
+        normalizer.Normalize(in, &out);
+        cout << "INPUT: " << in << " --> OUTPUT: " << out << endl;
+        outfile << out << endl;
+      }
+    }
+    outfile.close();
 
     return 0;
 }
